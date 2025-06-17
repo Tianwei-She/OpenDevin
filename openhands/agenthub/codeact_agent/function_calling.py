@@ -503,6 +503,20 @@ def response_to_actions(response: ModelResponse) -> list[Action]:
             elif tool_call.function.name == 'str_replace_editor':
                 # We implement this in agent_skills, which can be used via Jupyter
                 # convert tool_call.function.arguments to kwargs that can be passed to file_editor
+                
+                command = arguments.get('command')
+                if command == 'create':
+                    if 'file_text' not in arguments or arguments['file_text'] is None:
+                        raise ValueError(f"Parameter 'file_text' is required for command: {command}")
+                elif command == 'str_replace':
+                    if 'old_str' not in arguments or arguments['old_str'] is None:
+                        raise ValueError(f"Parameter 'old_str' is required for command: {command}")
+                elif command == 'insert':
+                    if 'new_str' not in arguments or arguments['new_str'] is None:
+                        raise ValueError(f"Parameter 'new_str' is required for command: {command}")
+                    if 'insert_line' not in arguments or arguments['insert_line'] is None:
+                        raise ValueError(f"Parameter 'insert_line' is required for command: {command}")
+                
                 code = f'print(file_editor(**{arguments}))'
                 logger.debug(
                     f'TOOL CALL: str_replace_editor -> file_editor with code: {code}'
